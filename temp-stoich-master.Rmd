@@ -1,0 +1,182 @@
+---
+title: "Tidy Algal Plots"
+author: "mslein"
+date: "6/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+###**Summary**
+
+We investigated the stoichiometric mechanism that may underlie thermal acclimation curves via different nutrient and thermal environments
+
+###**Part 0.** Load packages & data 
+```{r, message = FALSE, results = 'hide', warning = FALSE}
+install.packages("gridExtra")
+install.packages("dplyr")
+install.packages("tidyverse")
+install.packages('plyr', repos = "http://cran.us.r-project.org")
+
+library(tidyverse)
+library(gridExtra)
+library(dplyr)
+
+CNP_data<-read.csv("tidy_CNP_vis_TEMP.csv")
+```
+###**Part 0.5** Basic summary statistics 
+```{r, message = FALSE, results = 'hide', warning = FALSE}
+
+##the effect of temperature and nutrient on CP ratio
+res.aov2CP <- aov(C_P ~ nutrient * Temperature, data = CNP_data)
+summary(res.aov2CP)
+
+##the effect of temperature and nutrient on CN ratio
+res.aov2CN <- aov(C_N ~ nutrient * Temperature, data = CNP_data)
+summary(res.aov2CN)
+##the effect of temperature and nutrient on NP ratio
+res.aov2NP <- aov(N_P ~ nutrient * Temperature, data = CNP_data)
+summary(res.aov2NP)
+```
+
+
+
+###**Part 1.** Plots 
+```{r, message = FALSE, warning = FALSE}
+
+##These are linear regression plots of the different ratios of the three nutrients across thermal gradient, colored by the nutrient environmen
+
+CN_linear<-ggplot(CNP_data, aes(x=Temperature, y=C_N,
+                              color=nutrient, shape=nutrient))+
+  geom_smooth(method="lm")+
+  geom_point()+
+  theme_classic()+
+  scale_color_manual(values = c("darkcyan", "brown3", "yellowgreen", "orange"))+
+  xlab("Temperature (C)")+
+  ylab("C:N Ratio")+
+  ggtitle("C:N Ratio across temperature gradient")
+CN_linear
+
+
+CP_linear<-ggplot(CNP_data, aes(x=Temperature, y=C_P,
+                         color=nutrient, shape=nutrient))+
+  geom_smooth(method="lm")+
+  geom_point()+
+  theme_classic()+
+  scale_color_manual(values = c("darkcyan", "brown3", "yellowgreen", "orange"))+
+  xlab("Temperature (C)")+
+  ylab("C:P Ratio")+
+  ggtitle("C:P Ratio across temperature gradient")
+CP_linear
+
+NP_linear<-ggplot(CNP_data, aes(x=Temperature, y=N_P,
+                         color=nutrient, shape=nutrient))+
+  geom_smooth(method="lm")+
+  geom_point()+
+  theme_classic()+
+  scale_color_manual(values = c("darkcyan", "brown3", "yellowgreen", "orange"))+
+  xlab("Temperature (C)")+
+  ylab("N:P Ratio")+
+  ggtitle("N:P Ratio across temperature gradient")
+NP_linear
+
+
+arranged<-grid.arrange(CN_linear, CP_linear, NP_linear)
+
+##These are boxplots of the same data (though less accurate because there are only 3 data points per treatment (tempxnutrient))
+CP_boxplot<-ggplot(CNP_data, aes(x=as.factor(Temperature), y=C_P,
+                                 color=nutrient, shape=nutrient))+
+  geom_boxplot()+
+  geom_point()+
+  theme_classic()+
+  scale_color_manual(values = c("darkcyan", "brown3", "yellowgreen", "orange"))+
+  xlab("Temperature (C)")+
+  ylab("C:P Ratio")+
+  ggtitle("C:P Ratio across temperature gradient")
+CP_boxplot
+
+CN_boxplot<-ggplot(CNP_data, aes(x=as.factor(Temperature), y=C_N,
+                                 color=nutrient, shape=nutrient))+
+  geom_boxplot()+
+  geom_point()+
+  theme_classic()+
+  scale_color_manual(values = c("darkcyan", "brown3", "yellowgreen", "orange"))+
+  xlab("Temperature (C)")+
+  ylab("C:N Ratio")+
+  ggtitle("C:N Ratio across temperature gradient")
+CN_boxplot
+
+NP_boxplot<-ggplot(CNP_data, aes(x=as.factor(Temperature), y=N_P,
+                                 color=nutrient, shape=nutrient))+
+  geom_boxplot()+
+  geom_point()+
+  theme_classic()+
+  scale_color_manual(values = c("darkcyan", "brown3", "yellowgreen", "orange"))+
+  xlab("Temperature (C)")+
+  ylab("N:P Ratio")+
+  ggtitle("N:P Ratio across temperature gradient")
+NP_boxplot
+
+
+grid.arrange(NP_boxplot, CP_boxplot, CN_boxplot)
+
+##Plots with no ratios and just the percentage of a given element across treatments
+
+N_total_box<-ggplot(CNP_data, aes(x=as.factor(Temperature), y=Per_N,
+                              color=nutrient, shape=nutrient))+
+  geom_boxplot()+
+  geom_point()+
+  theme_classic()+
+  scale_color_manual(values = c("darkcyan", "brown3", "yellowgreen", "orange"))+
+  xlab("Temperature (C)")+
+  ylab("Percent N")+
+  ggtitle("Percent N across temperature gradient")
+N_total_box
+
+P_total_box<-ggplot(CNP_data, aes(x=as.factor(Temperature), y=Per_P,
+                              color=nutrient, shape=nutrient))+
+  geom_boxplot()+
+  geom_point()+
+  theme_classic()+
+  scale_color_manual(values = c("darkcyan", "brown3", "yellowgreen", "orange"))+
+  xlab("Temperature (C)")+
+  ylab("Percent P")+
+  ggtitle("Percent P across temperature gradient")
+P_total_box 
+
+NP_linear<-ggplot(CNP_data, aes(x=Temperature, y=N_P,
+                                color=nutrient, shape=nutrient))+
+  geom_smooth(method="lm")+
+  geom_point()+
+  theme_classic()+
+  scale_color_manual(values = c("darkcyan", "brown3", "yellowgreen", "orange"))+
+  xlab("Temperature (C)")+
+  ylab("N:P Ratio")+
+  ggtitle("N:P Ratio across temperature gradient")
+NP_linear
+
+TotalP_linear<-ggplot(CNP_data, aes(x=Temperature, y=Per_P,
+                                    color=nutrient, shape=nutrient))+
+  geom_smooth(method="lm")+
+  geom_point()+
+  theme_classic()+
+  scale_color_manual(values = c("darkcyan", "brown3", "yellowgreen", "orange"))+
+  xlab("Temperature (C)")+
+  ylab("Percent P")+
+  ggtitle("Percent P across temperature gradient")
+TotalP_linear
+
+TotalN_linear<-ggplot(CNP_data, aes(x=Temperature, y=Per_N,
+                                    color=nutrient, shape=nutrient))+
+  geom_smooth(method="lm")+
+  geom_point()+
+  theme_classic()+
+  scale_color_manual(values = c("darkcyan", "brown3", "yellowgreen", "orange"))+
+  xlab("Temperature (C)")+
+  ylab("Percent N")+
+  ggtitle("Percent N across temperature gradient")
+TotalN_linear
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

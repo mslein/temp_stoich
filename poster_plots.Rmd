@@ -1,0 +1,72 @@
+---
+title: "tempstoich_poster"
+author: "mslein"
+date: "6/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message = FALSE, results = 'hide', warning = FALSE}
+##install.packages("knitr")
+##install.packages("tidyverse")
+##install.packages("xfun")
+##install.packages('plyr', repos = "http://cran.us.r-project.org")
+#install.packages("gridExtra")
+#library(contrib.url)
+library(knitr)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(gridExtra)
+
+stoich<-read.csv("tidy_CNP_vis_TEMP.csv") 
+```
+
+```{r pressure, echo=FALSE}
+##Histogram 
+#histCN
+ggplot(data=stoich, mapping = aes(x= C_N, fill=Treatment))+
+  geom_histogram(binwidth = 1, color= "white", fill = "steelblue")+ 
+  facet_wrap(~nutrient)
+
+#histCP
+ggplot(data=stoich, mapping = aes(x= C_P, fill=Treatment))+
+  geom_histogram(color= "white", fill = "steelblue")+ 
+  facet_wrap(~nutrient)
+
+#histNP
+ggplot(data=stoich, mapping = aes(x= N_P, y=..density.., fill=Treatment))+
+  geom_histogram(binwidth = 1, color= "white", fill = "steelblue")+ 
+  facet_wrap(~nutrient)+
+  geom_density()
+
+##scatterplot 
+#scatCN
+ggplot(data=stoich, mapping = aes(x= as.factor(Temperature), y= C_N, color = nutrient))+
+  geom_point(alpha = 0.8, size = 5)+
+  theme_minimal()+
+  labs(x = "Temperature (C)", y = "C:N", title = "C:N Ratio from 15-37 C")+
+  scale_color_manual(values = c("darkcyan", "brown3", "yellowgreen", "orange"))
+  
+
+#scatCP
+ggplot(data=stoich, mapping = aes(x= as.factor(Temperature), y= C_P, color = nutrient))+
+  geom_point(alpha = 0.8, size = 5)+
+  theme_minimal()+
+  labs(x = "Temperature (C)", y = "C:P", title = "C:P Ratio from 15-37 C")+
+  scale_color_manual(values = c("darkcyan", "brown3", "yellowgreen", "orange"))
+
+#scatNP
+ggplot(data=stoich, mapping = aes(x= as.factor(Temperature), y= N_P, color = nutrient))+
+  geom_point(alpha = 0.8, size = 5)+
+  theme_minimal()+
+  labs(x = "Temperature (C)", y = "N:P", title = "N:P Ratio from 15-37 C")+
+  scale_color_manual(values = c("darkcyan", "brown3", "yellowgreen", "orange"))
+
+
+
+```
+
